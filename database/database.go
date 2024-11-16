@@ -5,6 +5,8 @@ import (
 	"sync"
 )
 
+var StoreIdCache = make(map[string]bool)
+
 type JobStatus string
 
 const (

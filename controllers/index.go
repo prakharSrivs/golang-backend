@@ -83,9 +83,9 @@ func JobInfoController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	job, error := JobStore.GetJob(jobId)
+	job, err := JobStore.GetJob(jobId)
 
-	if error != nil {
+	if err != nil {
 		ReplyError(w, "JobId does not exist", http.StatusBadRequest)
 		return
 	}
