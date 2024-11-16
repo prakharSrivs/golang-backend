@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/prakharsrivs/kirana-club-assignment/database"
+	"github.com/prakharsrivs/kirana-club-assignment/processor"
 )
 
 var JobStore = database.CreateNewJobStore()
@@ -52,6 +53,8 @@ func JobSubmissionController(w http.ResponseWriter, r *http.Request) {
 	jobRes := &JobResponse{
 		JobId: jobId,
 	}
+
+	go processor.ProcessJob(jobId, jobReq.Visits, &database.JobStore{})
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(jobRes)
