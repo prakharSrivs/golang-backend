@@ -60,9 +60,10 @@ func JobSubmissionController(w http.ResponseWriter, r *http.Request) {
 
 // Outgoing JobInfo Response for JobInfoController
 type JobInfoResponse struct {
-	Status database.JobStatus  `json:"status"`
-	JobId  int                 `json:"job_id"`
-	Errors []database.JobError `json:"error,omitempty"`
+	Status  database.JobStatus  `json:"status"`
+	JobId   int                 `json:"job_id"`
+	Errors  []database.JobError `json:"error,omitempty"`
+	Results []database.Result   `json:"results,omitempty"`
 }
 
 // Get Job Info Request Controller - /api/status?jobId=123
@@ -94,6 +95,7 @@ func JobInfoController(w http.ResponseWriter, r *http.Request) {
 		Status: job.Status,
 		JobId:  jobId,
 		Errors: job.Errors,
+		// Results: job.Results,
 	}
 
 	w.WriteHeader(http.StatusOK)

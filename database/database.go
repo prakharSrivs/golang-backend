@@ -9,6 +9,7 @@ import (
 var StoreIdCache = make(map[string]bool)
 
 type JobStatus string
+type Perimeter int
 
 const (
 	JobOngoing   JobStatus = "ongoing"
@@ -27,11 +28,17 @@ type JobError struct {
 	Error   string `json:"error"`
 }
 
+type Result struct {
+	ImageURL  string `json:"image_url"`
+	Perimeter int    `json:"perimeter"`
+}
+
 type Job struct {
-	JobId  int        `json:"job_id"`
-	Status JobStatus  `json:"status"`
-	Visits []Visit    `json:"visits"`
-	Errors []JobError `json:"error,omitempty"`
+	JobId   int        `json:"job_id"`
+	Status  JobStatus  `json:"status"`
+	Visits  []Visit    `json:"visits"`
+	Results []Result   `json:"results,omitempty"`
+	Errors  []JobError `json:"error,omitempty"`
 }
 
 type JobStore struct {
@@ -54,9 +61,10 @@ func (js *JobStore) CreateNewJob(visits []Visit) int {
 	js.lastId++
 	jobId := js.lastId
 	js.jobs[jobId] = Job{
-		JobId:  jobId,
-		Visits: visits,
-		Status: JobOngoing,
+		JobId:   jobId,
+		Visits:  visits,
+		Status:  JobOngoing,
+		Results: []Result{},
 	}
 
 	return jobId
@@ -75,7 +83,7 @@ func (js *JobStore) GetJob(jobId int) (Job, error) {
 	return job, nil
 }
 
-func (js *JobStore) UpdateJobStatus(jobId int, status JobStatus, jobErrors []JobError) error {
+func (js *JobStore) UpdateJobStatus(jobId int, status JobStatus, jobErrors []JobError, jobResults []Result) error {
 	js.mu.Lock()
 	defer js.mu.Unlock()
 	job, exists := js.jobs[jobId]
@@ -85,6 +93,7 @@ func (js *JobStore) UpdateJobStatus(jobId int, status JobStatus, jobErrors []Job
 	}
 	job.Status = status
 	job.Errors = jobErrors
+	job.Results = jobResults
 	js.jobs[jobId] = job
 	return nil
 }
