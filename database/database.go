@@ -2,6 +2,7 @@ package database
 
 import (
 	"errors"
+	"log"
 	"sync"
 )
 
@@ -68,7 +69,7 @@ func (js *JobStore) GetJob(jobId int) (Job, error) {
 	job, exists := js.jobs[jobId]
 
 	if !exists {
-		return job, errors.New("JobId does not exists")
+		return job, errors.New("JobId does not exist")
 	}
 
 	return job, nil
@@ -77,14 +78,13 @@ func (js *JobStore) GetJob(jobId int) (Job, error) {
 func (js *JobStore) UpdateJobStatus(jobId int, status JobStatus, jobErrors []JobError) error {
 	js.mu.Lock()
 	defer js.mu.Unlock()
-
-	job, error := js.GetJob(jobId)
-
-	if error != nil {
-		return error
+	job, exists := js.jobs[jobId]
+	if !exists {
+		log.Println("Job Id does not exist", jobId)
+		return errors.New("JobId does not exist")
 	}
-
 	job.Status = status
 	job.Errors = jobErrors
+	js.jobs[jobId] = job
 	return nil
 }

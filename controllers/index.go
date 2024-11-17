@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -38,7 +37,6 @@ func ReplyError(w http.ResponseWriter, err string, errorStatus int) {
 
 // Submit Job - /api/submit
 func JobSubmissionController(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Job Submission Request Recieved")
 	w.Header().Set("Content-Type", "application/json")
 
 	var jobReq JobRequest
@@ -54,7 +52,7 @@ func JobSubmissionController(w http.ResponseWriter, r *http.Request) {
 		JobId: jobId,
 	}
 
-	go processor.ProcessJob(jobId, jobReq.Visits, &database.JobStore{})
+	go processor.ProcessJob(jobId, jobReq.Visits, JobStore)
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(jobRes)
@@ -69,7 +67,6 @@ type JobInfoResponse struct {
 
 // Get Job Info Request Controller - /api/status?jobId=123
 func JobInfoController(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Job Info Request Recieved")
 	w.Header().Set("Content-Type", "application/json")
 
 	jobIdString := r.URL.Query().Get("jobid")

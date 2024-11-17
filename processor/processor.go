@@ -7,11 +7,10 @@ import (
 	"time"
 
 	"github.com/prakharsrivs/kirana-club-assignment/database"
-	"github.com/prakharsrivs/kirana-club-assignment/helpers"
 )
 
 func generateRandomSleepDuration() int {
-	randomInteger := rand.Intn(300) + 100
+	randomInteger := rand.Intn(3000) + 1000
 	return randomInteger
 }
 
@@ -21,13 +20,6 @@ func ProcessJob(jobId int, visits []database.Visit, jobStore *database.JobStore)
 	for i := 0; i < len(visits); i++ {
 		imageUrlsList := visits[i].ImageURLs
 		storeId := visits[i].StoreID
-		if !helpers.ValidateStoreId(storeId, database.StoreIdCache) {
-			errors = append(errors, database.JobError{
-				StoreId: storeId,
-				Error:   "Invalid StoreId",
-			})
-			continue
-		}
 
 		for _, imageUrl := range imageUrlsList {
 			_, err := http.Get(imageUrl)
@@ -41,17 +33,15 @@ func ProcessJob(jobId int, visits []database.Visit, jobStore *database.JobStore)
 			time.Sleep(time.Duration(generateRandomSleepDuration()) * time.Millisecond)
 		}
 
-		status := database.JobCompleted
-		if len(errors) > 0 {
-			status = database.JobFailed
-		}
+	}
 
-		err := jobStore.UpdateJobStatus(jobId, status, errors)
-
-		if err != nil {
-			log.Panic("Failed to Update Job Status", jobId)
-		}
-
+	status := database.JobCompleted
+	if len(errors) > 0 {
+		status = database.JobFailed
+	}
+	err := jobStore.UpdateJobStatus(jobId, status, errors)
+	if err != nil {
+		log.Panic("Failed to Update Job Status", jobId)
 	}
 
 }
