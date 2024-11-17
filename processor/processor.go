@@ -10,7 +10,7 @@ import (
 )
 
 func generateRandomSleepDuration() int {
-	randomInteger := rand.Intn(3000) + 1000
+	randomInteger := rand.Intn(300) + 100
 	return randomInteger
 }
 
@@ -20,6 +20,14 @@ func ProcessJob(jobId int, visits []database.Visit, jobStore *database.JobStore)
 	for i := 0; i < len(visits); i++ {
 		imageUrlsList := visits[i].ImageURLs
 		storeId := visits[i].StoreID
+
+		// if !helpers.ValidateStoreId(storeId, database.StoreIdCache) {
+		// 	errors = append(errors, database.JobError{
+		// 		StoreId: storeId,
+		// 		Error:   "Invalid StoreId",
+		// 	})
+		// 	continue
+		// }
 
 		for _, imageUrl := range imageUrlsList {
 			_, err := http.Get(imageUrl)
