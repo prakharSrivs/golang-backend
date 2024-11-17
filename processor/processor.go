@@ -22,6 +22,14 @@ func ProcessJob(jobId int, visits []database.Visit, jobStore *database.JobStore)
 		imageUrlsList := visits[i].ImageURLs
 		storeId := visits[i].StoreID
 
+		if !helpers.ValidateStoreId(storeId, database.StoreIdCache) {
+			errors = append(errors, database.JobError{
+				StoreId: storeId,
+				Error:   "StoreId not present in the Provided Store Master CSV File",
+			})
+			continue
+		}
+
 		for _, imageUrl := range imageUrlsList {
 			perimeter, err := helpers.CalculatePerimeter(imageUrl)
 			if err != nil {
