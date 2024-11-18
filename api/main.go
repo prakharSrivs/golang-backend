@@ -10,6 +10,7 @@ import (
 	"github.com/prakharsrivs/kirana-club-assignment/helpers"
 )
 
+// Processing the csv file and storing all the storeId beforehand
 func handleCsvFilePreProcessing() {
 	helpers.LoadStoreIds("StoreMasterAssignment.csv", database.StoreIdCache)
 }

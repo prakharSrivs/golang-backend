@@ -11,6 +11,7 @@ var StoreIdCache = make(map[string]bool)
 type JobStatus string
 type Perimeter int
 
+// Constant Grouping for three kinds of Job Statuses
 const (
 	JobOngoing   JobStatus = "ongoing"
 	JobCompleted JobStatus = "completed"
@@ -41,12 +42,14 @@ type Job struct {
 	Errors  []JobError `json:"error,omitempty"`
 }
 
+// Model for In Memory - Non Persistent Database
 type JobStore struct {
-	mu     sync.Mutex
+	mu     sync.Mutex // for Mutual Exclusivity
 	jobs   map[int]Job
 	lastId int
 }
 
+// To Create a New Job Store
 func CreateNewJobStore() *JobStore {
 	return &JobStore{
 		jobs:   make(map[int]Job),
@@ -54,6 +57,7 @@ func CreateNewJobStore() *JobStore {
 	}
 }
 
+// To Create a new Job
 func (js *JobStore) CreateNewJob(visits []Visit) int {
 	js.mu.Lock()
 	defer js.mu.Unlock()
@@ -70,6 +74,7 @@ func (js *JobStore) CreateNewJob(visits []Visit) int {
 	return jobId
 }
 
+// To Fetch a Job
 func (js *JobStore) GetJob(jobId int) (Job, error) {
 	js.mu.Lock()
 	defer js.mu.Unlock()
@@ -83,9 +88,11 @@ func (js *JobStore) GetJob(jobId int) (Job, error) {
 	return job, nil
 }
 
+// To Update the Status of a Job
 func (js *JobStore) UpdateJobStatus(jobId int, status JobStatus, jobErrors []JobError, jobResults []Result) error {
 	js.mu.Lock()
 	defer js.mu.Unlock()
+
 	job, exists := js.jobs[jobId]
 	if !exists {
 		log.Println("Job Id does not exist", jobId)

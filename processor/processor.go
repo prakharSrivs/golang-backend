@@ -9,6 +9,7 @@ import (
 	"github.com/prakharsrivs/kirana-club-assignment/helpers"
 )
 
+// Generating Random Sleep Duration
 func generateRandomSleepDuration() int {
 	randomInteger := rand.Intn(300) + 100
 	return randomInteger
@@ -16,12 +17,13 @@ func generateRandomSleepDuration() int {
 
 func ProcessJob(jobId int, visits []database.Visit, jobStore *database.JobStore) {
 	var errors []database.JobError
-	var results []database.Result
+	var results []database.Result // For Storing Perimeters of Image
 
 	for i := 0; i < len(visits); i++ {
 		imageUrlsList := visits[i].ImageURLs
 		storeId := visits[i].StoreID
 
+		// Validating StoreId
 		if !helpers.ValidateStoreId(storeId, database.StoreIdCache) {
 			errors = append(errors, database.JobError{
 				StoreId: storeId,
@@ -31,6 +33,7 @@ func ProcessJob(jobId int, visits []database.Visit, jobStore *database.JobStore)
 		}
 
 		for _, imageUrl := range imageUrlsList {
+			// Calculating Perimeter
 			perimeter, err := helpers.CalculatePerimeter(imageUrl)
 			if err != nil {
 				errors = append(errors, database.JobError{StoreId: storeId, Error: err.Error()})
@@ -38,6 +41,7 @@ func ProcessJob(jobId int, visits []database.Visit, jobStore *database.JobStore)
 			}
 			result := database.Result{ImageURL: imageUrl, Perimeter: perimeter}
 			results = append(results, result)
+			// Performing GPU Simulation
 			time.Sleep(time.Duration(generateRandomSleepDuration()) * time.Millisecond)
 		}
 

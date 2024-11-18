@@ -14,6 +14,7 @@ import (
 	"golang.org/x/image/webp"
 )
 
+// Loading Store Id's into the JobStoreIdCache Map Data Structure
 func LoadStoreIds(filePath string, storeIdCache map[string]bool) error {
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -30,6 +31,7 @@ func LoadStoreIds(filePath string, storeIdCache map[string]bool) error {
 
 	var store_id_col_index = -1
 
+	// Finding the Column Position of StoreID
 	for i, col := range data[0] {
 		if col == "StoreID" {
 			store_id_col_index = i
@@ -40,6 +42,7 @@ func LoadStoreIds(filePath string, storeIdCache map[string]bool) error {
 		return errors.New(" StoreID Column Missing in the CSV File")
 	}
 
+	// Storing all the StoreID's in the Map of StoreIdCache
 	for i, row := range data {
 		if i == 0 {
 			continue
@@ -50,13 +53,16 @@ func LoadStoreIds(filePath string, storeIdCache map[string]bool) error {
 	return nil
 }
 
+// Function to validate storeId
 func ValidateStoreId(storeId string, storeIdCache map[string]bool) bool {
 	_, exists := storeIdCache[storeId]
 	return exists
 }
 
+// Calculating Perimeter of an Image
 func CalculatePerimeter(imageURL string) (int, error) {
 	resp, errr := http.Get(imageURL)
+	// Extracting the type of image from the URL
 	imageType := imageURL[(strings.LastIndex(imageURL, "."))+1:]
 	if errr != nil {
 		return 0, errors.New(" Failed to Fetch the Image")

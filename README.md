@@ -1,4 +1,4 @@
-# Kirana Club Backend Intern Assignment
+# Golang Backend
 
 This Project implements a backend service to process images collected from stores. It includes job creation, image processing and status tracking, all developed in Go with performance in mind by Utilizing the multi threaded nature of Go
 
